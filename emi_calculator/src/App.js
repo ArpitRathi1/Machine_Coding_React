@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
+import { tenureData } from "./utils/constants";
 
 function App() {
   const [cost, setCost] = useState(0);
@@ -9,17 +10,54 @@ function App() {
   const [tenure, setTenure] = useState(12);
   const [emi, setEmi] = useState(0);
 
-  const updateEMI = () => {
+  const calculateEMI = (dp) => {
+    if(!cost) return
+
+    const loanAmt = cost - dp
+    const rate = interest / 100
+    const numberOfYears = tenure / 12
+
+    const emi = (loanAmt * rate * (1 + rate)**numberOfYears) / ((1+rate)**numberOfYears - 1)
+    return Number(emi/12).toFixed(0)
+  }
+
+  const calculateDP = (emi) => {
+    if(!cost) return
+    const downpaymentPercentage = 100 - (emi / calculateEMI(0)) *100;
+    return Number((downpaymentPercentage/100) * cost).toFixed(0)
+  }
+
+  useEffect(() => {
+    if(!cost) {
+      setDownpayment(0)
+      setEmi(0)
+    }
+
+    const emi = calculateEMI(downpayment)
+    setEmi(emi)
+  },[tenure])
+
+  const updateEMI = (e) => {
+    if(!cost) return
+    const dp = Number(e.target.value)
+    setDownpayment(dp.toFixed(0))
     
+    // Calculate emi and update it
+    const emi = calculateEMI(dp)
+    setEmi(emi)
   }
 
-  const updateDownpayment = () => {
+  const updateDownpayment = (e) => {
+    if(!cost) return
+    const emi = Number(e.target.value)
+    setEmi(emi.toFixed(0))
     
+    // Calculate DP and update it
+    const dp = calculateDP(emi)
+    setDownpayment(dp)
   }
 
-  const calculateEMI = () => {
-
-  }
+ 
 
   return (
     <div className="w-11/12 px-4 flex flex-col gap-5">
@@ -84,6 +122,14 @@ function App() {
           <label>{calculateEMI(0)}</label>
          </div>
       </div>
+
+      <label className="font-semibold">Tenure</label>
+      <div className="flex justify-between w-[30%]">
+        {tenureData.map((t, i) => {
+          return <button className={`px-8 py-4 rounded-full bg-blue-400 ${t===tenure ? `bg-blue-600 text-white` : ""}`} key={i} onClick={() => setTenure(t)}>{t}</button>
+        })}
+      </div>
+      
       
     </div>
   );
