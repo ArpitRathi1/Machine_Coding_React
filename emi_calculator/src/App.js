@@ -17,6 +17,10 @@ function App() {
     
   }
 
+  const calculateEMI = () => {
+
+  }
+
   return (
     <div className="w-11/12 px-4 flex flex-col gap-5">
       <h2 className="font-bold text-[25px]">EMI Calculator </h2>
@@ -60,12 +64,27 @@ function App() {
       <label htmlFor="downpayment" className="font-semibold">
         Down Payment
       </label>
-      <input id="downpayment" type="range" min={0} max={cost} value={downpayment} onChange={updateEMI}/>
+      <div className="w-full">
+         <input className="w-full" id="downpayment" type="range" min={0} max={cost} value={downpayment} onChange={updateEMI}/>
+         <div className="flex justify-between">
+          <label>0%</label>
+          <b>{downpayment}</b>
+          <label>100%</label>
+         </div>
+      </div>
 
       <label htmlFor="emi" className="font-semibold">
         Loan per month
       </label>
-      <input id="em" type="range" min={0} max={cost} value={emi} onChange={updateDownpayment}/>
+      <div className="w-full">
+       <input className="w-full" id="em" type="range" min={calculateEMI(cost)} max={calculateEMI(0)} value={emi} onChange={updateDownpayment}/>
+       <div className="flex justify-between">
+          <label>{calculateEMI(cost)}</label>
+          <b>{emi}</b>
+          <label>{calculateEMI(0)}</label>
+         </div>
+      </div>
+      
     </div>
   );
 }
